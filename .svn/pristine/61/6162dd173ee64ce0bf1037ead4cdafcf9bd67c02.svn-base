@@ -1,0 +1,22 @@
+package client.potlach.com.potlachandroid.fragment;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import client.potlach.com.potlachandroid.R;
+
+/**
+ * Created by thiago on 10/8/14.
+ */
+public class HomeGiftFragment extends BaseFragment {
+    private static final String TAG = "HomeGiftFragment";
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_home_gift, container, false);
+        return rootView;
+    }
+}

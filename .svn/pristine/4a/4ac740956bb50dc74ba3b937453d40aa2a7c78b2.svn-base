@@ -1,0 +1,117 @@
+package client.potlach.com.potlachandroid.activity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Looper;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import java.util.Collection;
+import java.util.concurrent.Callable;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+import client.potlach.com.potlachandroid.async.CallableTask;
+import client.potlach.com.potlachandroid.async.TaskCallback;
+import client.potlach.com.potlachandroid.model.User;
+import client.potlach.com.potlachandroid.service.UserSvc;
+import client.potlach.com.potlachandroid.service.UserSvcApi;
+
+import client.potlach.com.potlachandroid.R;
+
+public class LoginActivity extends BaseActivity {
+
+    @InjectView(R.id.loginButton)
+    protected Button loginButton;
+    @InjectView(R.id.usernameEditText)
+    protected EditText usernameEditText;
+    @InjectView(R.id.passwordEditText)
+    protected EditText passwordEditText;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if(getIntent().getExtras()!=null && getIntent().getExtras().containsKey("error")){
+            String error = getIntent().getExtras().getString("error");
+            Log.d("PhotoGift",error);
+        }
+
+        setContentView(R.layout.activity_login);
+
+        ButterKnife.inject(this);
+//
+//        getActionBar().hide();
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.login, menu);
+        return false;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @OnClick(R.id.loginButton)
+    public void Login(){
+        final String user = usernameEditText.getText().toString();
+        final String pass = passwordEditText.getText().toString();
+
+        final UserSvcApi svc = UserSvc.init(user, pass);
+
+        CallableTask.invoke(new Callable<Collection<User>>() {
+
+            @Override
+            public Collection<User> call() throws Exception {
+                Collection<User> result = svc.getUserList();
+                return result;
+            }
+        }, new TaskCallback<Collection<User>>() {
+
+            @Override
+            public void success(Collection<User> result) {
+                // OAuth 2.0 grant was successful and we
+                // can talk to the server, open up the video listing
+                User loggedUser = new User();
+                loggedUser.setId(1l);
+                loggedUser.setName(user);
+                loggedUser.setUsername(user);
+                loggedUser.setPassword(pass);
+                app.setLoggedUser(loggedUser);
+                startActivity(new Intent(
+                        LoginActivity.this,
+                        HomeActivity.class));
+            }
+
+            @Override
+            public void error(Exception e) {
+                Log.d(LoginActivity.class.getName(), "Error logging in via OAuth.", e);
+
+                Toast.makeText(
+                        LoginActivity.this,
+                        "Login failed, check your Internet connection and credentials.",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
+
+    }
+}

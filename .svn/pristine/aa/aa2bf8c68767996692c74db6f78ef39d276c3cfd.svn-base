@@ -1,0 +1,33 @@
+package client.potlach.com.potlachandroid.service;
+
+import java.util.Collection;
+
+import client.potlach.com.potlachandroid.model.Chain;
+import client.potlach.com.potlachandroid.model.User;
+import retrofit.http.Body;
+import retrofit.http.GET;
+import retrofit.http.POST;
+import retrofit.http.Query;
+
+/**
+ * This interface defines an API for a ChainSvc. The
+ * interface is used to provide a contract for client/server
+ * interactions. The interface is annotated with Retrofit
+ * annotations so that clients can automatically convert the
+ * 
+ * 
+ * @author jules
+ *
+ */
+public interface ChainSvcApi {
+	
+	// The path where we expect the ChainSvc to live
+	public static final String CHAIN_SVC_PATH = "/chain";
+
+	@GET(CHAIN_SVC_PATH)
+	public Collection<Chain> getChainList();
+	
+	@POST(CHAIN_SVC_PATH)
+	public Void addChain(@Body Chain c);
+	
+}

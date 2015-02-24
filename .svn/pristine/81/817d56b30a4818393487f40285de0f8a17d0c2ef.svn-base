@@ -1,0 +1,100 @@
+package client.potlach.com.potlachandroid.activity;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.TextView;
+
+import com.devsmart.android.ui.HorizontalListView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import client.potlach.com.potlachandroid.R;
+import client.potlach.com.potlachandroid.model.Chain;
+import client.potlach.com.potlachandroid.util.ChainListAdapter;
+
+/**
+ * Created by thiago on 10/8/14.
+ */
+public class HorizontalListViewActivity extends Activity {
+
+
+    private List<Chain> createFakeChain(){
+        Chain chain = new Chain();
+        chain.setTitle("Chain 1");
+        Chain chain2 = new Chain();
+        chain2.setTitle("Chain 2");
+        Chain chain3 = new Chain();
+        chain3.setTitle("Chain 3");
+        List<Chain> chains = new ArrayList<Chain>();
+        chains.add(chain);
+        chains.add(chain2);
+        chains.add(chain3);
+        return chains;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.listviewdemo);
+
+        HorizontalListView listview = (HorizontalListView) findViewById(R.id.listview);
+        //Load Chains from Service
+        ChainListAdapter adapter = new ChainListAdapter(this, createFakeChain());
+        listview.setAdapter(adapter);
+
+    }
+
+    private static String[] dataObjects = new String[]{ "Text #1",
+            "Text #2",
+            "Text #3" };
+
+    private BaseAdapter mAdapter = new BaseAdapter() {
+
+        private View.OnClickListener mOnButtonClicked = new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(HorizontalListViewActivity.this);
+                builder.setMessage("hello from " + v);
+                builder.setPositiveButton("Cool", null);
+                builder.show();
+
+            }
+        };
+
+        @Override
+        public int getCount() {
+            return dataObjects.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View retval = LayoutInflater.from(parent.getContext()).inflate(R.layout.viewitem, null);
+            TextView title = (TextView) retval.findViewById(R.id.title);
+            Button button = (Button) retval.findViewById(R.id.clickbutton);
+            button.setOnClickListener(mOnButtonClicked);
+            title.setText(dataObjects[position]);
+
+            return retval;
+        }
+
+    };
+}

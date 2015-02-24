@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory android:title="@string/pref_user_profile" >
+        <CheckBoxPreference
+            android:key="@string/pref_key_obscene_enabled"
+            android:title="@string/pref_title_obscene_gift"
+            android:summary="@string/pref_description_obscene_gift"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_update_setting" >
+
+        <ListPreference
+            android:key="@string/pref_key_sync_frequency"
+            android:title="@string/pref_title_sync_frequency"
+            android:entries="@array/pref_sync_frequency_titles"
+            android:entryValues="@array/pref_sync_frequency_values"
+            android:defaultValue="180"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

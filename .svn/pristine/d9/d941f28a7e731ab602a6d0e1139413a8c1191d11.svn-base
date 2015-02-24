@@ -1,0 +1,76 @@
+package client.potlach.com.potlachandroid.util;
+
+import android.app.Activity;
+import android.content.Context;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+
+import java.util.List;
+
+import client.potlach.com.potlachandroid.R;
+import client.potlach.com.potlachandroid.model.Chain;
+import client.potlach.com.potlachandroid.widget.GenericAdapter;
+
+public class ChainListAdapter extends GenericAdapter<Chain> {
+    private Context ctx;
+    private ChainViewHolder holder;
+    private Activity activity;
+
+    public ChainListAdapter(Activity activity, List<Chain> objects) {
+        super(activity, objects);
+        ctx = activity.getBaseContext();
+        this.activity = activity;
+    }
+
+    @Override
+    public View getDataRow(int position, View convertView, ViewGroup parent) {
+
+
+        Log.d(ChainListAdapter.class.getName(), "GetView Holder");
+        View row = convertView;
+
+        if (row == null) {
+            LayoutInflater inflater = LayoutInflater.from(ctx);
+            row = inflater.inflate(R.layout.single_row_chain, parent, false);
+            holder = new ChainViewHolder(row);
+            row.setTag(holder);
+        } else {
+            holder = (ChainViewHolder) row.getTag();
+        }
+
+        configRow(row);
+
+        Chain chain = getItem(position);
+        holder.getChainTitleTextView().setText(chain.getName());
+        holder.getGiftsCountTextView().setText(chain.getGiftsCount().toString());
+        holder.getFollowersCountTextView().setText(chain.getFollowersCount().toString());
+        holder.getGiftThumb().setImageResource(R.drawable.landscape);
+        return row;
+    }
+
+    private void configRow(View row) {
+        LinearLayout rootLayout = (LinearLayout) row;
+        rootLayout.setFocusable(false);
+        rootLayout.findViewById(R.id.chainTitleTextView).setFocusable(false);
+        rootLayout.findViewById(R.id.chainImageView).setFocusable(false);
+        rootLayout.findViewById(R.id.giftsCountTextView).setFocusable(false);
+    }
+
+    @Override
+    public View getFooterView(int position, View convertView, ViewGroup parent) {
+        return super.getFooterView(position, convertView, parent);
+    }
+
+    public Chain getItem(int position) {
+        return dataList.get(position);
+    }
+
+    public long getItemId(int position) {
+        return position;
+    }
+
+}

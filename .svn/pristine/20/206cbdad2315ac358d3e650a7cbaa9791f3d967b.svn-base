@@ -1,0 +1,71 @@
+package client.potlach.com.potlachandroid.util;
+
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import client.potlach.com.potlachandroid.R;
+
+
+public class GiftViewHolder {
+    @InjectView(R.id.giftTitleTextView)
+    protected TextView giftTitleTextView;
+
+    @InjectView(R.id.giftLikeTouchsCountTextView)
+    protected TextView giftLikeTouchsCountTextView;
+
+    @InjectView(R.id.giftObsceneTouchsCountTextView)
+    protected TextView giftObsceneTouchsCountTextView;
+
+    @InjectView(R.id.giftDescriptionTextView)
+    protected TextView giftDescriptionTextView;
+
+    @InjectView(R.id.giftImageView)
+    protected ImageView giftThumb;
+
+    public GiftViewHolder(View row) {
+        ButterKnife.inject(this, row);
+    }
+
+    public TextView getGiftTitleTextView() {
+        return giftTitleTextView;
+    }
+
+    public void setGiftTitleTextView(TextView giftTitleTextView) {
+        this.giftTitleTextView = giftTitleTextView;
+    }
+
+    public TextView getGiftLikeTouchsCountTextView() {
+        return giftLikeTouchsCountTextView;
+    }
+
+    public void setGiftLikeTouchsCountTextView(TextView giftLikeTouchsCountTextView) {
+        this.giftLikeTouchsCountTextView = giftLikeTouchsCountTextView;
+    }
+
+    public TextView getGiftObsceneTouchsCountTextView() {
+        return giftObsceneTouchsCountTextView;
+    }
+
+    public void setGiftObsceneTouchsCountTextView(TextView giftObsceneTouchsCountTextView) {
+        this.giftObsceneTouchsCountTextView = giftObsceneTouchsCountTextView;
+    }
+
+    public ImageView getGiftThumb() {
+        return giftThumb;
+    }
+
+    public void setGiftThumb(ImageView giftThumb) {
+        this.giftThumb = giftThumb;
+    }
+
+    public TextView getGiftDescriptionTextView() {
+        return giftDescriptionTextView;
+    }
+
+    public void setGiftDescriptionTextView(TextView giftDescriptionTextView) {
+        this.giftDescriptionTextView = giftDescriptionTextView;
+    }
+}

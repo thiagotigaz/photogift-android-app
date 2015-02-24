@@ -1,0 +1,108 @@
+package client.potlach.com.potlachandroid.service;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.IBinder;
+import android.preference.PreferenceManager;
+
+import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import client.potlach.com.potlachandroid.PhotoGiftApplication;
+import client.potlach.com.potlachandroid.R;
+import client.potlach.com.potlachandroid.activity.GiftListActivity;
+import client.potlach.com.potlachandroid.model.Gift;
+
+/**
+ * Created by thiago on 11/20/14.
+ */
+/*  This service fetches the gifts posted by the logged in user in the last three days
+    and keep refreshing it based on the refresh interval, so if there are new touches
+    it creates a notification.  */
+public class RefreshService extends Service {
+
+    private PhotoGiftApplication app;
+    private GiftSvcApi giftSvc;
+    private int notificationCount = 0;
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        init();
+
+        ScheduledThreadPoolExecutor pool =
+                new ScheduledThreadPoolExecutor(1);
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(RefreshService.this);
+
+        long startDelay = 0;
+        long refreshInterval = defaultSharedPreferences.getInt(getString(R.string.pref_key_sync_frequency), 30);
+        TimeUnit unit = TimeUnit.MINUTES;
+        pool.scheduleAtFixedRate(new RefreshGiftsTask(),
+                startDelay, refreshInterval, unit);
+        return START_STICKY;
+    }
+
+    private void init() {
+        app = (PhotoGiftApplication) getApplication();
+        giftSvc = GiftSvc.getOrShowLogin(null);
+    }
+
+    private void createNotification(String msg, Long giftId){
+        notificationCount++;
+        int icone = R.drawable.ic_launcher;
+        String aviso = "O gift tal possui 10 novos touches";
+        long data = System.currentTimeMillis();
+        String titulo = "You have new touches!";
+        Context context = getApplicationContext();
+        Intent intent = new Intent(context, GiftListActivity.class);
+        intent.putExtra("GiftId", giftId);
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(context, notificationCount, intent,
+                        PendingIntent.FLAG_ONE_SHOT);
+
+        Notification notification = new Notification(icone, aviso, data);
+        notification.flags = Notification.FLAG_AUTO_CANCEL;
+        notification.flags = Notification.FLAG_AUTO_CANCEL;
+        notification.defaults |= Notification.DEFAULT_VIBRATE;
+        notification.defaults |= Notification.DEFAULT_LIGHTS;
+        notification.defaults |= Notification.DEFAULT_SOUND;
+        notification.setLatestEventInfo(context, titulo,
+                msg, pendingIntent);
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(ns);
+        notificationManager.notify(notificationCount, notification);
+    }
+
+    private class RefreshGiftsTask implements Runnable{
+
+        @Override
+        public void run() {
+            /*  Fetch latest gifts, add it to sqlite if it does not exist.
+                if gifts already in sqlite compare touches count to see if
+                it's necessary to create notification.  */
+            List<Gift> latestGifts = giftSvc.findLatestByOwner();
+            for(Gift g:latestGifts){
+                //Check if gift is already in SQLite, if so compare touches and create
+                //the notification based on the result, otherwise insert it into SQLite.
+
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        //clear all gifts where giftOwnerId == current Logged In User Id.
+        super.onDestroy();
+    }
+}

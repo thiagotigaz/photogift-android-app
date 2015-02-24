@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowTitleSize">0dp</item>
+    </style>
+
+    <style name="Widget.linkButton" parent="android:Widget.Holo.Light.Button.Small">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Widget.linkTextView" parent="android:Widget.Holo.Light.TextView">
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+
+    <color name="primary">#990000</color>
+</resources>

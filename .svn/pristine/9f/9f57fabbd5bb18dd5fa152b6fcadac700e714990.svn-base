@@ -1,0 +1,217 @@
+package client.potlach.com.potlachandroid.fragment;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Toast;
+
+import com.devsmart.android.ui.HorizontalListView;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import client.potlach.com.potlachandroid.R;
+import client.potlach.com.potlachandroid.async.CallableTask;
+import client.potlach.com.potlachandroid.async.TaskCallback;
+import client.potlach.com.potlachandroid.model.Chain;
+import client.potlach.com.potlachandroid.service.ChainSvc;
+import client.potlach.com.potlachandroid.service.ChainSvcApi;
+import client.potlach.com.potlachandroid.util.ChainListAdapter;
+
+/**
+ * Created by thiago on 10/8/14.
+ */
+public class HomeChainFragment extends BaseFragment {
+
+    private static final String TAG = "HomeChainFragment";
+
+    @InjectView(R.id.latestChainsListView)
+    HorizontalListView latestChainslistview;
+    @InjectView(R.id.followersCountChainsListView)
+    HorizontalListView followersCountListView;
+
+    ChainSvcApi chainSvc;
+
+    private List<Chain> createFakeChain() {
+        Chain chain = new Chain();
+        chain.setTitle("San Francisco");
+        Chain chain2 = new Chain();
+        chain2.setTitle("Bolivia");
+        Chain chain3 = new Chain();
+        chain3.setTitle("Christmas");
+        Chain chain4 = new Chain();
+        chain4.setTitle("Brazil");
+        Chain chain5 = new Chain();
+        chain5.setTitle("Rio de Janeiro");
+        ArrayList<Chain> chains = new ArrayList<Chain>();
+        chains.add(chain);
+        chains.add(chain2);
+        chains.add(chain3);
+        chains.add(chain4);
+        chains.add(chain5);
+        return chains;
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_home_chain, container, false);
+        ButterKnife.inject(this, rootView);
+
+        ChainListAdapter adapter = new ChainListAdapter(getActivity(), createFakeChain());
+        ChainListAdapter adapter2 = new ChainListAdapter(getActivity(), createFakeChain());
+        latestChainslistview.setAdapter(adapter);
+        latestChainslistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+                Log.d("PhotoGift", "listview clicked");
+
+                boolean isSelected = view.isSelected();
+                if (isSelected) {
+                    view.setSelected(false);
+                    view.setBackgroundDrawable(getResources().getDrawable(R.drawable.flat_background_active));
+                } else {
+                    view.setSelected(true);
+                    view.setBackgroundDrawable(getResources().getDrawable(R.drawable.flat_background_inactive));
+                }
+                Log.d("PhotoGift", "listitem selected after: " + isSelected);
+            }
+        });
+        followersCountListView.setAdapter(adapter2);
+        followersCountListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+                view.setSelected(true);
+                Log.d("PhotoGift", "listview clicked");
+            }
+        });
+        return rootView;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        Log.d(getResources().getString(R.string.app_name), "onAttach: " + TAG);
+        chainSvc = ChainSvc.getOrShowLogin(activity);
+        if (chainSvc != null)
+            Log.d(getResources().getString(R.string.app_name), "chainSvc created!");
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(getResources().getString(R.string.app_name), "onCreate: " + TAG);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.d(getResources().getString(R.string.app_name), "onViewCreated: " + TAG);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(getResources().getString(R.string.app_name), "onActivityCreated: " + TAG);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(getResources().getString(R.string.app_name), "onStart: " + TAG);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshLatestChains();
+        refreshFollowersCountChains();
+        Log.d(getResources().getString(R.string.app_name), "onResume: " + TAG);
+    }
+
+    private void refreshLatestChains() {
+        CallableTask.invoke(new Callable<Collection<Chain>>() {
+            @Override
+            public Collection<Chain> call() throws Exception {
+                return chainSvc.getChainList();
+            }
+        }, new TaskCallback<Collection<Chain>>() {
+            @Override
+            public void success(Collection<Chain> result) {
+                List<Chain> latestChains = new ArrayList<Chain>(result);
+            }
+
+            @Override
+            public void error(Exception e) {
+                Log.d(HomeChainFragment.class.getName(), "Error logging in via OAuth.", e);
+
+                Toast.makeText(activity, "Login failed, check your Internet connection and credentials.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void refreshFollowersCountChains() {
+        CallableTask.invoke(new Callable<Collection<Chain>>() {
+            @Override
+            public Collection<Chain> call() throws Exception {
+                return chainSvc.getChainList();
+            }
+        }, new TaskCallback<Collection<Chain>>() {
+            @Override
+            public void success(Collection<Chain> result) {
+                List<Chain> latestChains = new ArrayList<Chain>(result);
+            }
+
+            @Override
+            public void error(Exception e) {
+                Log.d(HomeChainFragment.class.getName(), "Error logging in via OAuth.", e);
+
+                Toast.makeText(activity, "Login failed, check your Internet connection and credentials.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(getResources().getString(R.string.app_name), "onPause: " + TAG);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(getResources().getString(R.string.app_name), "onStop: " + TAG);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(getResources().getString(R.string.app_name), "onDestroyView: " + TAG);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(getResources().getString(R.string.app_name), "onDestroy: " + TAG);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d(getResources().getString(R.string.app_name), "onDetach: " + TAG);
+    }
+}

@@ -1,0 +1,430 @@
+package client.potlach.com.potlachandroid.activity;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.devsmart.android.StringUtils;
+import com.ipaulpro.afilechooser.utils.FileUtils;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.ExecutionException;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+import client.potlach.com.potlachandroid.R;
+import client.potlach.com.potlachandroid.model.Chain;
+import client.potlach.com.potlachandroid.model.Gift;
+import client.potlach.com.potlachandroid.service.ChainSvc;
+import client.potlach.com.potlachandroid.service.ChainSvcApi;
+import client.potlach.com.potlachandroid.service.GiftSvc;
+import client.potlach.com.potlachandroid.service.GiftSvcApi;
+import client.potlach.com.potlachandroid.singleton.DataHolder;
+import client.potlach.com.potlachandroid.util.ScaleToFitWidthHeigthTransform;
+import retrofit.mime.TypedFile;
+
+
+public class PostGiftActivity extends BaseActivity {
+    private static final String TAG = "PostGiftActivity";
+
+    @InjectView(R.id.post_gift_imageView)
+    protected ImageView imageHolder;
+    @InjectView(R.id.post_gift_title_editText)
+    protected TextView titleTextView;
+    @InjectView(R.id.post_gift_description_editText)
+    protected TextView descriptionTextView;
+    @InjectView(R.id.post_gift_chain_title_autoCompleteTextView)
+    protected AutoCompleteTextView chainTitleTextView;
+    @InjectView(R.id.post_gift_button)
+    protected Button postButton;
+    private String mCurrentPhotoPath;
+
+    private ChainSvcApi chainSvc;
+    private GiftSvcApi giftSvc;
+
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_post_gift);
+        ButterKnife.inject(this);
+        chainSvc = ChainSvc.getOrShowLogin(this);
+        giftSvc = GiftSvc.getOrShowLogin(this);
+        if(getIntent().getExtras()!=null && getIntent().getExtras().containsKey("chainName")){
+            chainTitleTextView.setText(getIntent().getStringExtra("chainName"));
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.post_gift, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK)
+        {
+            if(requestCode == REQUEST_IMAGE_CAPTURE)
+            {
+                final boolean isCamera;
+                if(data == null)
+                {
+                    isCamera = true;
+                }
+                else
+                {
+                    final String action = data.getAction();
+                    if(action == null)
+                    {
+                        isCamera = false;
+                    }
+                    else
+                    {
+                        isCamera = action.equals(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    }
+                }
+
+                Uri selectedImageUri;
+                if(isCamera)
+                {
+//                    selectedImageUri = outputFileUri;
+                }
+                else
+                {
+                    selectedImageUri = data == null ? null : data.getData();
+//                    mCurrentPhotoPath = getPath(selectedImageUri);
+                    mCurrentPhotoPath = FileUtils.getPath(this,selectedImageUri);
+                }
+//                this.sendBroadcast(
+//                        new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+//                                Uri.parse(mCurrentPhotoPath)));
+                setGiftPicture();
+            }
+        }
+    }
+
+    //UPDATED!
+    public String getPath(Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = managedQuery(uri, projection, null, null, null);
+        if(cursor!=null)
+        {
+            //HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
+            //THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
+            int column_index = cursor
+                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        }
+        else return null;
+    }
+
+    @OnClick(R.id.post_gift_imageView)
+    public void selectOrTakePicture(){
+        startActivityForResult(createPictureIntent(this),REQUEST_IMAGE_CAPTURE);
+    }
+
+    @OnClick(R.id.post_gift_button)
+    public void postGift(){
+        String giftTitle = titleTextView.getText().toString();
+        String giftDesc = descriptionTextView.getText().toString();
+        String chainName = chainTitleTextView.getText().toString();
+
+        if(imageHolder.getTag().toString().equals("defaultImageHolder")){
+            Toast.makeText(this, getResources().getString(R.string.activity_post_gift_required_image), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(StringUtils.isEmptyString(giftTitle) || StringUtils.isEmptyString(chainName) || imageHolder.getTag().toString().equals("defaultImageHolder")){
+            Toast.makeText(this, getResources().getString(R.string.activity_post_gift_required_fields), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Gift gift = new Gift();
+        gift.setTitle(giftTitle);
+        gift.setDescription(giftDesc);
+        gift.setChain(new Chain(chainName));
+        try {
+            showProgressDialog(getResources().getString(R.string.post_gift_progress_upload));
+
+            Gift result = new PostGiftTask().execute(gift).get();
+            Chain c = new UploadGiftDataTask().execute(result.getId()).get();
+            DataHolder.getInstance().setCurrentChain(c);
+            startActivity(new Intent(PostGiftActivity.this, GiftListActivity.class));
+            finish();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void setGiftPicture() {
+        Picasso.Builder builder = new Picasso.Builder(PostGiftActivity.this);
+        Picasso picasso = builder.listener(new Picasso.Listener() {
+
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                Log.d("Picasso", "URI: "+uri.toString()+"  Picasso: "+ picasso.toString());
+                exception.printStackTrace();
+            }
+
+        }).build();
+
+        picasso.setIndicatorsEnabled(true);
+        picasso.setLoggingEnabled(true);
+        picasso.load(new File(mCurrentPhotoPath))
+                .resize(1024, 1024)
+                .centerCrop()
+                .into(target);
+
+
+
+
+        /*File f=new File(mCurrentPhotoPath);
+
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(f.getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Get the dimensions of the View
+        int targetW = imageHolder.getWidth();
+        int targetH = imageHolder.getHeight();
+
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        Log.d(PostGiftActivity.class.getName(), mCurrentPhotoPath);
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+        Log.d(PostGiftActivity.class.getName(), "W: "+photoW+" H: "+photoH);
+        // Determine how much to scale down the image
+        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        bitmap = RotateBitmap(bitmap,getCameraPhotoOrientation(this,null,mCurrentPhotoPath));
+        imageHolder.setImageBitmap(bitmap);
+        imageHolder.setTag(mCurrentPhotoPath);*/
+    }
+    private Target target = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            imageHolder.setImageBitmap(bitmap);
+            imageHolder.setTag(mCurrentPhotoPath);
+            FileOutputStream out = null;
+            try {
+                out = new FileOutputStream(mCurrentPhotoPath);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (out != null) {
+                        out.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+        }
+    };
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
+    public static int getCameraPhotoOrientation(Context context, Uri imageUri, String imagePath){
+        int rotate = 0;
+        try {
+//            context.getContentResolver().notifyChange(imageUri, null);
+            File imageFile = new File(imagePath);
+            ExifInterface exif = new ExifInterface(
+                    imageFile.getAbsolutePath());
+            int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
+
+
+            Log.d(PostGiftActivity.class.getName(), "Exit orientation: " + orientation);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rotate;
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File targetDir = new File(storageDir, "photogift");
+        if(!targetDir.exists())
+            targetDir.mkdir();
+        Log.d(PostGiftActivity.class.getName(), storageDir.getAbsolutePath());
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                targetDir      /* directory */
+        );
+        Log.d(PostGiftActivity.class.getName(), image.getAbsolutePath());
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    public Intent createPictureIntent(Activity activity){
+        Intent pickIntent = FileUtils.createGetContentIntent();
+        pickIntent.setType("image/*");
+//        pickIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File photoFile = null;
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                // Error occurred while creating the File
+            }
+
+        }
+        // Continue only if the File was successfully created
+        if (photoFile != null) {
+            Log.d(PostGiftActivity.class.getName(), "photoFile not null");
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                    Uri.fromFile(photoFile));
+        }
+
+        Intent chooserIntent = Intent.createChooser(pickIntent, activity.getResources().getString(R.string.title_select_or_choose_picture));
+        chooserIntent.putExtra
+                (
+                        Intent.EXTRA_INITIAL_INTENTS,
+                        new Intent[] { takePictureIntent }
+                );
+        return chooserIntent;
+    }
+
+    class PostGiftTask extends AsyncTask<Gift, Integer, Gift> {
+
+        @Override
+        protected void onPreExecute() {
+            showProgressDialog(getResources().getString(R.string.post_gift_progress_upload));
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Gift gift) {
+            dismissProgressDialog();
+            super.onPostExecute(gift);
+        }
+
+        @Override
+        protected Gift doInBackground(Gift... params) {
+            Gift g = params[0];
+
+            return giftSvc.addGift(g);
+        }
+    }
+
+    class UploadGiftDataTask extends AsyncTask<Long,Integer,Chain>{
+        @Override
+        protected void onPreExecute() {
+            showProgressDialog(getResources().getString(R.string.post_gift_progress_upload));
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Chain chain) {
+            dismissProgressDialog();
+            super.onPostExecute(chain);
+        }
+
+        @Override
+        protected Chain doInBackground(Long... params) {
+            ScaleToFitWidthHeigthTransform transform = new ScaleToFitWidthHeigthTransform(1024,true);
+
+            return giftSvc.setGiftData(params[0],new TypedFile("image/jpg", new File(mCurrentPhotoPath)));
+        }
+    }
+
+}

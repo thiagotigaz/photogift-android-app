@@ -1,0 +1,10 @@
+<resources>
+
+    <color name="black_overlay">#66000000</color>
+    <color name="dark">#333</color>
+    <color name="light">#DDD</color>
+    <color name="light_button">#EEE</color>
+    <color name="light_button_pressed">#CCC</color>
+    <color name="white">#FFF</color>
+    <color name="primary">#990000</color>
+</resources>

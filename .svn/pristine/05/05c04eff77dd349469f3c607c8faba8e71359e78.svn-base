@@ -1,0 +1,83 @@
+package client.potlach.com.potlachandroid.util;
+
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import client.potlach.com.potlachandroid.R;
+
+
+public class ChainViewHolder {
+    @InjectView(R.id.chainTitleTextView)
+	protected TextView chainTitleTextView;
+
+    @InjectView(R.id.chainFollowersCountTextView)
+    protected TextView followersCountTextView;
+
+    @InjectView(R.id.giftsCountTextView)
+    protected TextView giftsCountTextView;
+
+    @InjectView(R.id.giftImageView)
+    protected ImageView giftThumb;
+
+    @InjectView(R.id.chainFollowersCountImageView)
+    protected ImageView chainFollowersCountImageView;
+
+    @InjectView(R.id.giftsCountImageView)
+    protected ImageView giftsCountImageView;
+
+	public ChainViewHolder(View row) {
+        ButterKnife.inject(this,row);
+	}
+
+	public TextView getChainTitleTextView() {
+		return chainTitleTextView;
+	}
+
+	public void setChainTitleTextView(TextView chainTitleTextView) {
+		this.chainTitleTextView = chainTitleTextView;
+	}
+
+	public TextView getFollowersCountTextView() {
+		return followersCountTextView;
+	}
+
+	public void setFollowersCountTextView(TextView followersCountTextView) {
+		this.followersCountTextView = followersCountTextView;
+	}
+
+	public ImageView getGiftThumb() {
+		return giftThumb;
+	}
+
+	public void setGiftThumb(ImageButton giftThumb) {
+		this.giftThumb = giftThumb;
+	}
+
+    public TextView getGiftsCountTextView() {
+        return giftsCountTextView;
+    }
+
+    public void setGiftsCountTextView(TextView giftsCountTextView) {
+        this.giftsCountTextView = giftsCountTextView;
+    }
+
+    public ImageView getChainFollowersCountImageView() {
+        return chainFollowersCountImageView;
+    }
+
+    public void setChainFollowersCountImageView(ImageView chainFollowersCountImageView) {
+        this.chainFollowersCountImageView = chainFollowersCountImageView;
+    }
+
+    public ImageView getGiftsCountImageView() {
+        return giftsCountImageView;
+    }
+
+    public void setGiftsCountImageView(ImageView giftsCountImageView) {
+        this.giftsCountImageView = giftsCountImageView;
+    }
+}

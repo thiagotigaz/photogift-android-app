@@ -1,0 +1,97 @@
+package client.potlach.com.potlachandroid.model;
+
+import java.util.Date;
+
+public class Gift {
+	private Long id;
+	private String title;
+	private String description;
+	private String s3Path;
+	private Chain chain;
+	private Long likeTouches;
+	private Long obsceneTouches;
+	private Date creationDate;
+	private Date lastUpdatedDate;
+	private User owner;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getS3Path() {
+		return s3Path;
+	}
+
+	public void setS3Path(String s3Path) {
+		this.s3Path = s3Path;
+	}
+
+	public Chain getChain() {
+		return chain;
+	}
+
+	public void setChain(Chain chain) {
+		this.chain = chain;
+	}
+
+	public Long getLikeTouches() {
+		return likeTouches;
+	}
+
+	public void setLikeTouches(Long likeTouches) {
+		this.likeTouches = likeTouches;
+	}
+
+	public Long getObsceneTouches() {
+		return obsceneTouches;
+	}
+
+	public void setObsceneTouches(Long obsceneTouches) {
+		this.obsceneTouches = obsceneTouches;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public Date getLastUpdatedDate() {
+		return lastUpdatedDate;
+	}
+
+	public void setLastUpdatedDate(Date lastUpdatedDate) {
+		this.lastUpdatedDate = lastUpdatedDate;
+	}
+
+	public User getOwner() {
+		return owner;
+	}
+
+	public void setOwner(User owner) {
+		this.owner = owner;
+	}
+
+}

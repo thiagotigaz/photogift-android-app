@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="2" >
+
+    <dataSet config="main" >
+        <source path="/Users/thiago/Documents/workspace_android_studio/PotlachAndroid/devsmartAndroid/src/main/res" >
+            <file
+                name="icon"
+                path="/Users/thiago/Documents/workspace_android_studio/PotlachAndroid/devsmartAndroid/src/main/res/drawable-ldpi/icon.png"
+                qualifiers="ldpi-v4"
+                type="drawable" />
+            <file
+                name="icon"
+                path="/Users/thiago/Documents/workspace_android_studio/PotlachAndroid/devsmartAndroid/src/main/res/drawable-mdpi/icon.png"
+                qualifiers="mdpi-v4"
+                type="drawable" />
+        </source>
+        <source path="/Users/thiago/Documents/workspace_android_studio/PotlachAndroid/devsmartAndroid/build/generated/res/rs/release" />
+        <source path="/Users/thiago/Documents/workspace_android_studio/PotlachAndroid/devsmartAndroid/build/generated/res/generated/release" />
+    </dataSet>
+    <dataSet config="release" >
+        <source path="/Users/thiago/Documents/workspace_android_studio/PotlachAndroid/devsmartAndroid/src/release/res" />
+    </dataSet>
+
+</merger>

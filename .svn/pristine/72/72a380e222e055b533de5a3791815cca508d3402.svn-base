@@ -1,0 +1,29 @@
+package client.potlach.com.potlachandroid.activity;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+import client.potlach.com.potlachandroid.PhotoGiftApplication;
+import client.potlach.com.potlachandroid.R;
+import client.potlach.com.potlachandroid.exception.ExceptionHandler;
+
+/**
+ * Created by thiago on 10/9/14.
+ */
+public abstract class BaseActivity extends Activity{
+
+    protected PhotoGiftApplication app;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+//        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+        // Your mechanism is ready now.. In this activity from anywhere
+        // if you get force close error it will be redirected to the CrashActivity.
+        app = (PhotoGiftApplication) getApplication();
+    }
+
+    public PhotoGiftApplication getApp() {
+        return app;
+    }
+}

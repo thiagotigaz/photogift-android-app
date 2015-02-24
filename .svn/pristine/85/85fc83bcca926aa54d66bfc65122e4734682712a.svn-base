@@ -1,0 +1,30 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="client.potlach.com.potlachandroid.activity.HomeActivity" >
+
+    <item android:id="@+id/action_new_gift"
+        android:icon="@drawable/ic_action_new"
+        android:title="@string/action_new_gift"
+        android:orderInCategory="99"
+        android:showAsAction="always" />
+
+    <item android:id="@+id/action_horizontallist"
+        android:title="HorizontalList"
+        android:orderInCategory="101"
+        android:showAsAction="never" />
+
+    <item android:id="@+id/action_giftchain"
+        android:title="GiftChain"
+        android:orderInCategory="102"
+        android:showAsAction="never" />
+
+    <item android:id="@+id/action_selectpicture"
+        android:title="New Gift Picture"
+        android:orderInCategory="103"
+        android:showAsAction="never" />
+
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
+</menu>

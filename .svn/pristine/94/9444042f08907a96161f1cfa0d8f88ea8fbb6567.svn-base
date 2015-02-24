@@ -1,0 +1,37 @@
+package client.potlach.com.potlachandroid;
+
+import android.app.Application;
+import android.content.SharedPreferences;
+
+import com.google.gson.Gson;
+
+import client.potlach.com.potlachandroid.model.User;
+
+/**
+ * Created by thiago on 10/7/14.
+ */
+public class PhotoGiftApplication extends Application{
+    private static final String PREF_LOGGEDIN_USER = "pref_loggedin_user";
+    private SharedPreferences preferences;
+
+    public User getLoggedUser() {
+        String userJson = preferences.getString(PREF_LOGGEDIN_USER, "");
+        if (!userJson.equals(""))
+            return new Gson().fromJson(userJson, User.class);
+        else
+            return null;
+    }
+
+    public void setLoggedUser(User loggedInUser) {
+        if(loggedInUser!=null){
+            String userJson = new Gson().toJson(loggedInUser);
+            preferences.edit().putString(PREF_LOGGEDIN_USER, userJson).commit();
+        }
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        this.preferences = getSharedPreferences(getResources().getString(R.string.app_name),MODE_PRIVATE);
+    }
+}

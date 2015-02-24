@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:focusable="false"
+    android:descendantFocusability="blocksDescendants"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="false"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp">
+
+        <TextView
+            android:focusable="false"
+            style="@style/Widget.linkTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="San Francisco"
+            android:id="@+id/chainTitleTextView"
+            android:layout_weight="10"
+            />
+
+
+        <TextView
+            android:focusable="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="150"
+            android:drawableLeft="@drawable/ic_chain"
+            android:id="@+id/chainFollowersCountTextView"
+            style="@android:style/TextAppearance.Holo.Medium"
+            android:layout_weight="1"
+            android:gravity="center_vertical"/>
+
+        <TextView
+            android:focusable="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="150"
+            android:drawableLeft="@drawable/ic_picframe"
+            android:id="@+id/giftsCountTextView"
+            style="@android:style/TextAppearance.Holo.Medium"
+            android:layout_weight="1"
+            android:gravity="center_vertical"/>
+
+        </LinearLayout>
+
+
+
+        <ImageView
+            android:focusable="false"
+            android:layout_width="match_parent"
+            android:src="@drawable/landscape"
+            android:id="@+id/chainImageView"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            />
+
+</LinearLayout>

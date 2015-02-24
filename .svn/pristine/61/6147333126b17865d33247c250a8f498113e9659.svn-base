@@ -1,0 +1,29 @@
+package client.potlach.com.potlachandroid.util;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+/**
+ * Created by thiago on 11/21/14.
+ */
+public class GiftTouchesTrackerOpenHelper extends SQLiteOpenHelper {
+
+    public static String DBNAME = "PhotoGift";
+    public static int VERSION = 1;
+
+    public GiftTouchesTrackerOpenHelper(Context context) {
+//        super(context, DBNAME, factory, VERSION);
+        super(context, DBNAME, null, VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+}

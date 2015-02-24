@@ -1,0 +1,157 @@
+package client.potlach.com.potlachandroid.activity;
+
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import client.potlach.com.potlachandroid.R;
+import client.potlach.com.potlachandroid.model.Chain;
+import client.potlach.com.potlachandroid.model.Gift;
+import client.potlach.com.potlachandroid.service.GiftSvc;
+import client.potlach.com.potlachandroid.service.GiftSvcApi;
+import client.potlach.com.potlachandroid.singleton.DataHolder;
+import client.potlach.com.potlachandroid.util.GiftListAdapter;
+import client.potlach.com.potlachandroid.widget.EndlessScrollListener;
+
+
+public class GiftListActivity extends BaseActivity{
+
+    private static final String TAG = "GiftListActivity";
+
+    private Chain currentChain;
+    @InjectView(R.id.giftListView)
+    protected ListView giftListView;
+    private GiftSvcApi giftSvc;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_gift_list);
+        ButterKnife.inject(this);
+        currentChain = DataHolder.getInstance().getCurrentChain();
+        giftSvc = GiftSvc.getOrShowLogin(this);
+        if(currentChain!=null){
+            setActionBarTitle(currentChain.getName());
+            initGiftListView();
+        }
+
+        //Load chain from asyncTask, pass gifts from chain to
+        //adapter.
+    }
+
+    private void initGiftListView() {
+        Long giftCount = 0l;
+        List<Gift> gifts = null;
+        currentChain.setGifts(null);
+        if(currentChain.getGifts()==null){
+            try {
+                giftCount = new CountGiftsByChainIdTask().execute(currentChain.getId()).get();
+                if(giftCount!=0)
+                    gifts = new LoadGiftsByChainIdAndPage().execute(currentChain.getId(), 0l).get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+
+        }else{
+            gifts = currentChain.getGifts();
+            giftCount = Long.parseLong(Integer.toString(gifts.size())) ;
+        }
+        if(giftCount > 0) {
+            final GiftListAdapter adapter = new GiftListAdapter(this, gifts);
+            adapter.setServerListSize(Integer.parseInt(giftCount.toString()));
+            giftListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+
+                    Gift g = adapter.getDataList().get(position);
+
+                }
+            });
+            giftListView.setAdapter(adapter);
+            final Long finalGiftCount = giftCount;
+            giftListView.setOnScrollListener(new EndlessScrollListener(1, 0) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount) {
+                    if(totalItemsCount-1 < finalGiftCount){
+                        Log.d(TAG, "Loading more items, page: "+page+" totalItems: "+totalItemsCount);
+                        Log.d(TAG, "CurrentChainId: "+currentChain.getId());
+                        try {
+                            List<Gift> result = new LoadGiftsByChainIdAndPage().execute(currentChain.getId(), Long.parseLong(Integer.toString(page))).get();
+                            if(result!=null){
+                                adapter.getDataList().addAll(result);
+                                adapter.notifyDataSetChanged();
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.gift_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        switch (id){
+            case R.id.action_new_gift:
+                Intent i = new Intent(this, PostGiftActivity.class);
+                i.putExtra("chainName",currentChain.getName());
+                startActivity(i);
+                finish();
+                return true;
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    class LoadGiftsByChainIdAndPage extends AsyncTask<Long,Integer,List<Gift>>{
+
+        @Override
+        protected List<Gift> doInBackground(Long... params) {
+            Log.d(TAG,params[0].toString() + "  "+params[1].toString());
+            Long chainId = params[0];
+            Integer page = Integer.parseInt(params[1].toString());
+            Log.d(TAG,chainId + "  "+page);
+            return giftSvc.findByChainIdAndPage(chainId, page);
+        }
+    }
+
+    class CountGiftsByChainIdTask extends AsyncTask<Long,Void,Long>{
+
+        @Override
+        protected Long doInBackground(Long... params) {
+            return giftSvc.countByChainId(params[0]);
+        }
+    }
+}

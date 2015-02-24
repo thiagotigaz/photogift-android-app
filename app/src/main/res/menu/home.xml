@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="client.potlach.com.potlachandroid.activity.HomeActivity" >
+
+    <item android:id="@+id/action_search"
+        android:icon="@drawable/ic_action_search"
+        android:title="@string/action_search"
+        android:orderInCategory="98"
+        android:showAsAction="always|collapseActionView"
+        android:actionLayout="@layout/search"/>
+
+    <item android:id="@+id/action_new_gift"
+        android:icon="@drawable/ic_action_new"
+        android:title="@string/action_new_gift"
+        android:orderInCategory="99"
+        android:showAsAction="always" />
+
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
+
+    <item android:id="@+id/action_logout"
+        android:title="@string/action_logout"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
+</menu>

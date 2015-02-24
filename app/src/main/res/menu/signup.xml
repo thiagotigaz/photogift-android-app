@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/action_signup"
+        android:icon="@drawable/ic_check"
+        android:title="@string/action_signup"
+        android:orderInCategory="98"
+        android:showAsAction="always" />
+
+</menu>

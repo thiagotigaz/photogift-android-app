@@ -1,0 +1,49 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.potlach.client.activity.GiftListActivity">
+
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/giftListView"
+        android:layout_above="@+id/linearLayout" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout">
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/flat_background_selector"
+            android:layout_height="wrap_content"
+            android:id="@+id/likeTouchImageButton"
+            android:src="@drawable/ic_heart"/>
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/flat_background_selector"
+            android:layout_height="wrap_content"
+            android:id="@+id/postGiftImageButton"
+            android:src="@drawable/ic_chain"
+            android:layout_gravity="center_horizontal" />
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/flat_background_selector"
+            android:layout_height="wrap_content"
+            android:id="@+id/obsceneTouchImageButton"
+            android:src="@drawable/ic_warning"
+            android:layout_gravity="right" />
+    </LinearLayout>
+</RelativeLayout>

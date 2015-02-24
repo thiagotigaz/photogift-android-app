@@ -1,0 +1,85 @@
+package client.potlach.com.potlachandroid.util;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import client.potlach.com.potlachandroid.R;
+import client.potlach.com.potlachandroid.model.Chain;
+
+public class ChainListAdapter extends BaseAdapter {
+	private Context ctx;
+	private ArrayList<Chain> chains;
+	private ChainViewHolder holder;
+
+	public ChainListAdapter(Context context, List<Chain> objects) {
+		ctx = context;
+		if (objects != null)
+			chains = new ArrayList<Chain>(objects);
+		else
+			chains = new ArrayList<Chain>();
+	}
+
+	public View getView(int position, View convertView, ViewGroup parent) {
+		View row = convertView;
+		if (row == null) {
+			LayoutInflater inflater = LayoutInflater.from(ctx);
+			row = inflater.inflate(R.layout.single_row_chain, parent, false);
+			holder = new ChainViewHolder(row);
+			row.setTag(holder);
+		} else {
+			holder = (ChainViewHolder) row.getTag();
+		}
+
+		Chain chain = chains.get(position);
+        holder.getGiftThumb().setImageResource(R.drawable.ic_launcher);
+
+//        if(position==0){
+            String s = chain.getTitle();
+            s = s.substring(0, Math.min(s.length(), 27));
+            holder.getChainTitleTextView().setText(s);
+            holder.getFollowersCountTextView().setText("150");
+            holder.getGiftsCountTextView().setText("200");
+//            holder.getGiftsCountImageView().setVisibility(View.VISIBLE);
+//            holder.getChainFollowersCountImageView().setVisibility(View.VISIBLE);
+//        }
+        /*else{
+            holder.getChainTitleTextView().setText("");
+            holder.getFollowersCountTextView().setText("");
+            holder.getGiftsCountTextView().setText("");
+            holder.getGiftsCountImageView().setVisibility(View.INVISIBLE);
+            holder.getChainFollowersCountImageView().setVisibility(View.INVISIBLE);;
+        }*/
+
+		return row;
+	}
+
+	public int getCount() {
+		if (chains == null)
+			return 0;
+		return chains.size();
+	}
+
+	public Object getItem(int position) {
+		return chains.get(position);
+	}
+
+	public long getItemId(int position) {
+		return position;
+	}
+
+	public ArrayList<Chain> getChains() {
+		return chains;
+	}
+
+	public void setChains(ArrayList<Chain> chains) {
+		this.chains = chains;
+	};
+
+}

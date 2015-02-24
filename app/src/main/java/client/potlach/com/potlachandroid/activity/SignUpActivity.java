@@ -1,0 +1,130 @@
+package client.potlach.com.potlachandroid.activity;
+
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.devsmart.android.StringUtils;
+
+import java.util.concurrent.ExecutionException;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+import client.potlach.com.potlachandroid.R;
+import client.potlach.com.potlachandroid.model.User;
+import client.potlach.com.potlachandroid.model.UserCredentialsStatus;
+import client.potlach.com.potlachandroid.model.UserCredentialsStatus.UserCredentialsState;
+import client.potlach.com.potlachandroid.service.UserSvc;
+import client.potlach.com.potlachandroid.service.UserSvcApi;
+
+/**
+ * Created by thiago on 11/3/14.
+ */
+public class SignUpActivity extends BaseActivity{
+
+    @InjectView(R.id.signup_usernameEditText)
+    protected TextView usernameTextView;
+    @InjectView(R.id.signup_emailEditText)
+    protected TextView emailTextView;
+    @InjectView(R.id.signup_passwordEditText)
+    protected TextView passwordTextView;
+
+    private UserSvcApi userSvc;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sign_up);
+        ButterKnife.inject(this);
+        setBackEnabled(getActionBar());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.signup, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.action_signup:
+                signUp();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void signUp(){
+        String username = usernameTextView.getText().toString();
+        String email = emailTextView.getText().toString();
+        String password = passwordTextView.getText().toString();
+        if(StringUtils.isEmptyString(username)||StringUtils.isEmptyString(email)||StringUtils.isEmptyString(password)){
+            Toast.makeText(this, getResources().getString(R.string.activity_signup_required_fields), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            UserCredentialsState userCredentialsState = new CheckExistingCredentials().execute(username, email).get();
+            switch (userCredentialsState){
+                case BOTH_AVAILABLE:
+                    new SignUpTask().execute(username,email,password);
+                    break;
+                case USERNAME_AVAILABLE:
+                    Toast.makeText(this, getResources().getString(R.string.activity_signup_email_not_available), Toast.LENGTH_SHORT).show();
+                    break;
+                case EMAIL_AVAILABLE:
+                    Toast.makeText(this, getResources().getString(R.string.activity_signup_username_not_available), Toast.LENGTH_SHORT).show();
+                    break;
+                case NONE_AVAILABLE:
+                    Toast.makeText(this, getResources().getString(R.string.activity_signup_username_and_email_not_available), Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    class CheckExistingCredentials extends AsyncTask<String, Void, UserCredentialsState>{
+
+        @Override
+        protected UserCredentialsState doInBackground(String... params) {
+            userSvc = UserSvc.initNoLogin();
+
+            return userSvc.checkExistingCredentials(params[0],params[1]);
+        }
+    }
+
+    class SignUpTask extends AsyncTask<String,Void,User>{
+
+        @Override
+        protected void onPostExecute(User user) {
+            app.logout(SignUpActivity.this);
+            Toast.makeText(SignUpActivity.this, getResources().getString(R.string.activity_signup_user_registered), Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected User doInBackground(String... params) {
+            User u = new User();
+            u.setUsername(params[0]);
+            u.setEmail(params[1]);
+            u.setPassword(params[2]);
+
+            return userSvc.addUser(u);
+        }
+    }
+
+}

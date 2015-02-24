@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="client.potlach.com.potlachandroid" >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <application
+        android:name="client.potlach.com.potlachandroid.PhotoGiftApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="client.potlach.com.potlachandroid.activity.LoginActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="client.potlach.com.potlachandroid.activity.ChainListActivity"
+            android:label="@string/title_activity_giftchain_list" >
+        </activity>
+        <activity
+            android:name="client.potlach.com.potlachandroid.activity.GiftListActivity"
+            android:label="@string/title_activity_gift_list"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="client.potlach.com.potlachandroid.activity.PostGiftActivity"
+            android:label="@string/title_activity_post_gift"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
+            android:name="client.potlach.com.potlachandroid.activity.SignUpActivity"
+            android:label="@string/title_activity_signup"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="client.potlach.com.potlachandroid.activity.PreferencesActivity"
+            android:label="@string/title_activity_preferences" >
+        </activity>
+        <activity
+            android:name="client.potlach.com.potlachandroid.activity.HomeActivity"
+            android:label="@string/title_activity_home"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <service android:name="client.potlach.com.potlachandroid.service.RefreshUserGiftsTouchesService" />
+
+        <activity
+            android:name="client.potlach.com.potlachandroid.activity.LikeTouchesUserActivity"
+            android:label="@string/title_activity_like_touches_user" >
+        </activity>
+    </application>
+
+</manifest>

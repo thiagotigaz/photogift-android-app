@@ -1,0 +1,79 @@
+package client.potlach.com.potlachandroid.service;
+
+import java.util.Collection;
+import java.util.List;
+
+import client.potlach.com.potlachandroid.model.Chain;
+import client.potlach.com.potlachandroid.model.Gift;
+import client.potlach.com.potlachandroid.model.GiftStatus;
+import retrofit.client.Response;
+import retrofit.http.Body;
+import retrofit.http.GET;
+import retrofit.http.Headers;
+import retrofit.http.Multipart;
+import retrofit.http.POST;
+import retrofit.http.Part;
+import retrofit.http.Path;
+import retrofit.http.Query;
+import retrofit.http.Streaming;
+import retrofit.mime.TypedFile;
+
+
+public interface GiftSvcApi {
+    public static final String DATA_PARAMETER = "data";
+
+    public static final String ID_PARAMETER = "id";
+
+    public static final String TITLE_PARAMETER = "title";
+
+    public static final String CHAIN_PARAMETER = "chainid";
+
+    public static final String PAGENUMBER_PARAMETER = "pagenumber";
+
+    public static final String GIFT_SVC_PATH = "/gift";
+
+    public static final String GIFT_DATA_PATH = GIFT_SVC_PATH + "/{id}/data";
+
+    public static final String GIFT_LIKE_TOUCH_PATH = GIFT_SVC_PATH + "/{id}/like";
+
+    public static final String GIFT_UNLIKE_TOUCH_PATH = GIFT_SVC_PATH + "/{id}/unlike";
+
+    public static final String GIFT_OBSCENE_TOUCH_PATH = GIFT_SVC_PATH + "/{id}/obscene";
+
+    public static final String GIFT_REVERT_OBSCENE_TOUCH_PATH = GIFT_SVC_PATH + "/{id}/revertobscene";
+
+    public static final String GIFT_CHAIN_PATH = GIFT_SVC_PATH + "/{id}/chain/{chainid}";
+
+    public static final String GIFT_CHAINID_AND_PAGE_PATH = GIFT_SVC_PATH + "/chain/{chainid}/page/{pagenumber}";
+
+    public static final String GIFT_COUNTBY_CHAINID_PATH = GIFT_SVC_PATH + "/chain/{chainid}/count";
+
+    @POST(GIFT_SVC_PATH)
+    public Gift addGift(@Body Gift g);
+
+    @Multipart
+    @POST(GIFT_DATA_PATH)
+    public Chain setGiftData(@Path(ID_PARAMETER) long id, @Part(DATA_PARAMETER) TypedFile giftData);
+
+    @Streaming
+    @GET(GIFT_DATA_PATH)
+    Response getGiftData(@Path(ID_PARAMETER) long id);
+
+    @GET(GIFT_CHAINID_AND_PAGE_PATH)
+    public List<Gift> findByChainIdAndPage(@Path(CHAIN_PARAMETER)Long chainId, @Path(PAGENUMBER_PARAMETER)Integer page);
+
+    @GET(GIFT_COUNTBY_CHAINID_PATH)
+    public Long countByChainId(@Path(CHAIN_PARAMETER)Long chainId);
+
+    @POST(GIFT_LIKE_TOUCH_PATH)
+    public Gift likeTouch(@Path(ID_PARAMETER) Long giftId);
+
+    @POST(GIFT_UNLIKE_TOUCH_PATH)
+    public Gift unlikeTouch(@Path(ID_PARAMETER) Long giftId);
+
+    @POST(GIFT_OBSCENE_TOUCH_PATH)
+    public Gift obsceneTouch(@Path(ID_PARAMETER) Long giftId);
+
+    @POST(GIFT_REVERT_OBSCENE_TOUCH_PATH)
+    public Gift revertObsceneTouch(@Path(ID_PARAMETER) Long giftId);
+}

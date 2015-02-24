@@ -1,0 +1,77 @@
+package client.potlach.com.potlachandroid.activity;
+
+import android.app.ActionBar;
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.TypefaceSpan;
+
+import client.potlach.com.potlachandroid.PhotoGiftApplication;
+import client.potlach.com.potlachandroid.exception.ExceptionHandler;
+
+/**
+ * Created by thiago on 10/9/14.
+ */
+public abstract class BaseActivity extends Activity implements AsyncActivity {
+
+    protected PhotoGiftApplication app;
+    protected ProgressDialog progressDialog;
+    protected boolean destroyed = false;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+//        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+        // Your mechanism is ready now.. In this activity from anywhere
+        // if you get force close error it will be redirected to the CrashActivity.
+        app = (PhotoGiftApplication) getApplication();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.destroyed = true;
+    }
+
+    public PhotoGiftApplication getApp() {
+        return app;
+    }
+
+    @Override
+    public void showLoadingProgressDialog() {
+        this.showProgressDialog("Loading. Please wait...");
+    }
+
+    @Override
+    public void showProgressDialog(CharSequence message) {
+        if (this.progressDialog == null) {
+            this.progressDialog = new ProgressDialog(this);
+            this.progressDialog.setIndeterminate(true);
+        }
+
+        this.progressDialog.setMessage(message);
+        this.progressDialog.show();
+    }
+
+    @Override
+    public void dismissProgressDialog() {
+        if (this.progressDialog != null && !this.destroyed) {
+            this.progressDialog.dismiss();
+        }
+    }
+
+    public void setActionBarTitle(String title) {
+        SpannableString s = new SpannableString(title);
+        s.setSpan(new TypefaceSpan("Roboto-Bold.ttf"), 0, s.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        // Update the action bar title with the TypefaceSpan instance
+        ActionBar actionBar = getActionBar();
+        actionBar.setTitle(title);
+        actionBar.setDisplayUseLogoEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+}
